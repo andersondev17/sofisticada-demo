@@ -1,0 +1,6 @@
+{
+  "name": "Aetheris Voyage",
+  "description": "Cinematic space-travel landing page with looping background videos, custom JS crossfade, and a liquid-glass design system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
