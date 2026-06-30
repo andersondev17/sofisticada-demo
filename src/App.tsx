@@ -88,7 +88,7 @@ export default function App() {
         {/* Background Image (High-fashion Boutique Campaign) */}
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           <img
-            src="/src/assets/images/boutique_hero_bg_1782789403863.jpg"
+            src="/images/boutique_hero_bg_1782789403863.jpg"
             alt="Sofisticada Boutique Campaign"
             className="absolute left-1/2 top-0 -translate-x-1/2 w-[120%] h-[120%] object-cover object-top opacity-65"
             referrerPolicy="no-referrer"
@@ -152,7 +152,7 @@ export default function App() {
         {/* Background Image (High-fashion Boutique Interior) */}
         <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
           <img
-            src="/src/assets/images/boutique_campaign_bg_1782794841206.jpg"
+            src="/images/boutique_campaign_bg_1782794841206.jpg"
             alt="Sofisticada Boutique Experience"
             className="absolute inset-0 w-full h-full object-cover opacity-65"
             referrerPolicy="no-referrer"
