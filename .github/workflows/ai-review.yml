@@ -1,0 +1,68 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_call:
+    secrets:
+      ANTHROPIC_API_KEY:
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  secrets-scan:
+    name: Secrets scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint-and-typecheck:
+    name: Type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # This repo's "lint" script IS `tsc --noEmit` — no separate eslint config here,
+      # so there's no second step to run (unlike ammae-tech, which has both).
+      - run: npm run lint
+
+  ai-review:
+    name: Claude review (security, clean code, architecture, tests, PR hygiene)
+    needs: [secrets-scan, lint-and-typecheck]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Load review prompt
+        id: prompt
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref || 'main' }}"
+          {
+            echo 'content<<EOF'
+            sed "s/\${BASE_REF}/$BASE_REF/g" .github/ai-review-prompt.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: ${{ steps.prompt.outputs.content }}
+          track_progress: true
+          claude_args: "--max-turns 15"
